@@ -122,7 +122,7 @@ song_list.grid(columnspan=20)
 defined_font = font.Font(family='Helvetica')
 #play button
 photo = PhotoImage(file = "C:/Users/USER/PycharmProjects/musicPlayer/play2.png")
-play_buttton = Button(root, image=photo, width =20,command=Play)
+play_buttton = Button(root, text='►', width =20,command=Play)
 play_buttton.grid(row=1, column=0)
 
 #pause Button
@@ -146,7 +146,7 @@ stop_button['font'] = defined_font
 stop_button.grid(row=1, column=2)
 
 #resume button
-resume_button = Button(root, text='►', width=7, command=Resume)
+resume_button = Button(root, text='║║►', width=7, command=Resume)
 resume_button['font'] = defined_font
 resume_button.grid(row=1, column=3)
 
