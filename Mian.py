@@ -1,11 +1,23 @@
 import os
+#work around for pygame error
 os.add_dll_directory('C:/Users/USER/PycharmProjects/musicPlayer/venv/Lib/site-packages/pygame')
 from pygame import mixer
 import pygame
 from tkinter import*
 import tkinter.font as font
+import mysql.connector
+from mysql.connector import Error
 from tkinter import filedialog
 from tkinter import ttk
+
+#first connect to mysql server
+try:
+    conn = mysql.connector.connect(host='localhost', password='@Mosemuthoni57', user='Mosenje', db='musicplayer')
+    if conn.is_connected():
+        print("connection established....\n")
+except Error as e:
+    print("could not make a connection")
+
 def add_songs():
     temp_song = filedialog.askopenfilenames(initialdir="Music/", title="Choose a song",
                                           filetypes=(("mp3 Files", "*.mp3"),))
@@ -19,7 +31,6 @@ def delete_song():
 
 def volume(x):
     pygame.mixer.music.set_volume(slider.get())
-
 
 
 
@@ -61,6 +72,42 @@ def Next():
     song_list.activate(next_one)
     song_list.selection_set(next_one)
 
+#creating a function that adds selected music to a database
+def playlist():
+    cursor = conn.cursor()
+    add1 = song_list.curselection()
+    add = song_list.get(add1)
+    adds = f"C:/Users/USER/Music/Music/Mp3 songs/{add}"
+    insert_stmnt =(
+        " insert into music (name, num) value(%s,%s);"
+    )
+    data = (adds,1)
+    try:
+        cursor.execute(insert_stmnt, data)
+        print("success...")
+    except Error as err:
+        print(f"Error: '{err}'")
+#create a function that adds the playlist to the listbox
+def newlistbox():
+    song_list.delete(0,END)
+    cursor = conn.cursor()
+    result = None
+    query = "select name from music"
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for m in result:
+            m = str(m)
+            m = m.replace("('C:/Users/USER/Music/Music/Mp3 songs/", "")
+            m = m.replace("',)", "")
+            song_list.insert(END, m)
+
+
+    except Error as err:
+        print(f"Error: '{err}'")
+
+
+
 
 
 root =Tk()
@@ -68,9 +115,8 @@ root.title('Resly Music player')
 
 #initialize mixer
 mixer.init()
-
 #List box for songs
-song_list = Listbox(root, selectmode=SINGLE, bg='purple', fg='white', font= ('arial', 15), height=17, width=47, selectbackground='gray', selectforeground='black')
+song_list = Listbox(root, selectmode=SINGLE,relief=FLAT, activestyle=DOTBOX , cursor='hand2',bg='purple', highlightcolor= 'orange', fg='white', font= ('Georgia', 15), height=17, width=47, selectbackground='gray', selectforeground='black')
 song_list.grid(columnspan=20)
 
 defined_font = font.Font(family='Helvetica')
@@ -120,6 +166,8 @@ root.config(menu=my_menu)
 add_song_menu=Menu(my_menu)
 my_menu.add_cascade(label="♫ Menu",menu=add_song_menu)
 add_song_menu.add_command(label="Add songs", command = add_songs)
+add_song_menu.add_command(label="show playlist", command= newlistbox)
 add_song_menu.add_command(label='Delete song', command = delete_song)
+add_song_menu.add_command(label="add playlist", command= playlist)
 
 mainloop()
