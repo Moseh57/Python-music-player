@@ -12,7 +12,7 @@ from tkinter import ttk
 
 #first connect to mysql server
 try:
-    conn = mysql.connector.connect(host='localhost', password='@Mosemuthoni57', user='Mosenje', db='musicplayer')
+    conn = mysql.connector.connect(host='localhost', password='<PASSWORD>', user='<USER>', db='musicplayer')
     if conn.is_connected():
         print("connection established....\n")
 except Error as e:
